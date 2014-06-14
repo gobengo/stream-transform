@@ -17,6 +17,13 @@ describe('stream-cycle', function () {
     var things = cycle(streamToCycle);
     assertCycles(things, arrayToCycle, 20, done);
   });
+  it('cycles a piped readable', function (done) {
+    var arrayToCycle = [1,'2',3,{}];
+    var streamToCycle = new ReadableArray(arrayToCycle);
+    var things = cycle();
+    streamToCycle.pipe(things);
+    assertCycles(things, arrayToCycle, 20, done);
+  });
 });
 
 /**

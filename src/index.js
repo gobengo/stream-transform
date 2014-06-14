@@ -25,7 +25,6 @@ module.exports = function (source) {
     var index = 0;
     var endedError = new Error('There are no next items in the set to cycle');
 
-    source = source || [];
     if (Array.isArray(source)) {
         source = new ReadableArray(source);
     }
@@ -41,20 +40,28 @@ module.exports = function (source) {
         done();
     };
 
-    source.on('end', function () {
-        source.unpipe(cycle);
-        cycle._read = function () {
-            setTimeout(function () {
-                this.push(next());
-            }.bind(this));
-        }
-        cycle.read(0);
-    })
+    // ignore .end() commands as you are INFINITE
+    cycle.end = function (chunk) {
+        if (chunk) this.write(chunk);
+    };
+
+    cycle.on('pipe', function (source) {
+        source.on('end', function () {
+            cycle._read = function () {
+                setTimeout(function () {
+                    this.push(next());
+                }.bind(this));
+            }
+            cycle.read(0);
+        })
+    });
 
     // Initially, pipe the source through the cycle
     // But dont end when its done, because then we'll start
-    // replaying the history 
-    source.pipe(cycle, { end: false });
+    // replaying the history
+    if (source) {
+        source.pipe(cycle, { end: false });
+    }
 
     // get the next thing from the history according to index
     // this cycles because modulo
