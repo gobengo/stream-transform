@@ -1,0 +1,24 @@
+{
+  "name": "stream-cycle",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Livefyre/stream-cycle",
+  "authors": [
+    "Benjamin Goering <bengoering@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "stream": "Livefyre/stream#~0.1.1"
+  },
+  "devDependencies": {
+    "cajon": "~0.2.4",
+    "sinonjs": "~1.7.3",
+    "almond": "~0.2.9"
+  }
+}
