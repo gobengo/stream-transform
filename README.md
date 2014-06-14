@@ -1,5 +1,7 @@
 # stream-cycle
 
+![](http://media.giphy.com/media/9j1JaFT9Mbl3G/giphy.gif)
+
 Create a [stream](https://github.com/Livefyre/stream)/Readable that infinitely cycles over the items in an array or another, finite Readable. A lot like Python's [itertools.cycle](https://docs.python.org/2/library/itertools.html#itertools.cycle)
 
 One use case for this is to produce an infinite stream from an Array of mock objects so you can test downstream Writables.
