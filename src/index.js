@@ -5,8 +5,8 @@ var Transform = require('stream').Transform;
 var ReadableArray = require('stream/contrib/readable-array');
 
 /**
- * stream-cycle
- * var cycle = require('stream-cycle');
+ * stream-transform
+ * var cycle = require('stream-transform');
  * @param source {stream|array} Source to cycle
  * @example
  * from array

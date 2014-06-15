@@ -1,7 +1,7 @@
 (function (root, factory) {
     if ((typeof Livefyre === 'object') && (typeof Livefyre.define === 'function') && Livefyre.define.amd) {
         if (Livefyre.require.almond) {
-            return Livefyre.define('stream-cycle', [], factory);
+            return Livefyre.define('stream-transform', [], factory);
         }
         // Livefyre.define is defined by https://github.com/Livefyre/require
         Livefyre.define([], factory);
@@ -16,7 +16,7 @@
         //Browser globals case. Just assign the
         //result to a property on the global.
         root.Livefyre = root.Livefyre || {};
-        root.Livefyre['stream-cycle'] = factory();
+        root.Livefyre['stream-transform'] = factory();
     }
 }(this, function () {
     //almond, and your modules will be inlined here

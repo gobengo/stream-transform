@@ -8,7 +8,7 @@ require.config({
         chai: 'node_modules/chai/chai',
         debug: 'lib/debug/debug',
         inherits: 'lib/inherits/inherits',
-        'stream-cycle': 'src/index'
+        'stream-transform': 'src/index'
     },
     packages: [{
         name: 'stream',

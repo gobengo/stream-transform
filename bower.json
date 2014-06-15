@@ -1,7 +1,7 @@
 {
-  "name": "stream-cycle",
+  "name": "stream-transform",
   "version": "0.0.0",
-  "homepage": "https://github.com/Livefyre/stream-cycle",
+  "homepage": "https://github.com/Livefyre/stream-transform",
   "authors": [
     "Benjamin Goering <bengoering@gmail.com>"
   ],
