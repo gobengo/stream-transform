@@ -1,7 +1,5 @@
 # stream-transform
 
-![](http://media.giphy.com/media/9j1JaFT9Mbl3G/giphy.gif)
-
 Create a [stream](https://github.com/Livefyre/stream)/Transform by providing an asynchronous function to map over the stream.
 
 ## Example
