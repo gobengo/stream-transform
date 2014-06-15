@@ -6,70 +6,59 @@ var ReadableArray = require('stream/contrib/readable-array');
 
 /**
  * stream-transform
- * var cycle = require('stream-transform');
- * @param source {stream|array} Source to cycle
+ * var transform = require('stream-transform');
+ * @param _transform {function|stream}
+ *   Function to use as ._transform
+ *   Or a stream you want to wrap to have a .map property
  * @example
- * from array
- *   cycle([1,2,3,4]).pipe(dest);
- * remember what is piped in and cycle once ended
- *   source.pipe(cycle()).pipe(dest);
+ * source.pipe(transform(function (x, done) {
+ *   this.push(String(x), String(x));
+ *   done();  
+ * })).pipe(dest);
  */
-module.exports = function (source) {
+var transform = module.exports = function (_transform) {
     /*
     The general strategy is to
     * ensure source is a Readable. If it was an array, convert to ReadableArray
     * pipe the source though the Transform we return which records the history
-    * once the source has ended, we change _read to cycle the history
+    * once the source has ended, we change _read to transform the history
     */
     var history = [];
     var index = 0;
-    var endedError = new Error('There are no next items in the set to cycle');
+    var endedError = new Error('There are no next items in the set to transform');
+    var source;
 
-    if (Array.isArray(source)) {
-        source = new ReadableArray(source);
+    if (_transform && _transform.readable) {
+        source = _transform
     }
 
-    var cycle = new Transform({
+    if (typeof _transform !== 'function') {
+        _transform = function (x, done) { done(null, x); }
+    }
+
+    var transformer = new Transform({
         objectMode: true,
         highWaterMark: 1,
         lowWaterMark: 1
     });
-    // record what flows through cycle
-    cycle._transform = function (chunk, done) {
-        history.push(chunk);
-        done();
-    };
+    // record what flows through transform
+    transformer._transform = _transform;
 
-    // ignore .end() commands as you are INFINITE
-    cycle.end = function (chunk) {
-        if (chunk) this.write(chunk);
-    };
+    transformer.map = function () {
+        var mapped = transform.map.apply({}, arguments);
+        transformer.pipe(mapped);
+        return mapped;
+    }
 
-    cycle.on('pipe', function (source) {
-        source.on('end', function () {
-            cycle._read = function () {
-                setTimeout(function () {
-                    this.push(next());
-                }.bind(this));
-            }
-            cycle.read(0);
-        })
+    return transformer;
+};
+
+/**
+ * Shortcut for synchronous transforms that only need to produce
+ * one output per input
+ */
+transform.map = function (syncTransform) {
+    return transform(function (x, done) {
+        done(null, syncTransform(x));
     });
-
-    // Initially, pipe the source through the cycle
-    // But dont end when its done, because then we'll start
-    // replaying the history
-    if (source) {
-        source.pipe(cycle, { end: false });
-    }
-
-    // get the next thing from the history according to index
-    // this cycles because modulo
-    function next() {
-        var nextThing = history[index % history.length];
-        index++;
-        return nextThing;
-    }
-
-    return cycle;
 };

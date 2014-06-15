@@ -8,16 +8,19 @@ Create a [stream](https://github.com/Livefyre/stream)/Transform by providing an 
 
 ```javascript
 var alternating = cycle([1,0]);
-var alternatingIncremented = alternating.pipe(transform(function (x, done) {
-    done(x+1);
-}));
-alternatingIncremented.on('data', console.log);
-// 2
-// 1
-// 2
-// 1
-// 2
-// 1
+function increment = function (x) { return x + 1; };
+function incrementAsync = function (x, done) { done(null, increment(x)); };
+cycle([1,0])
+  .pipe(transform(incrementAsync)
+  .pipe(transform.map(increment)
+  .pipe(transform.map(String))
+  .on('data', console.log);
+// '3'
+// '2'
+// '3'
+// '2'
+// '3'
+// '2'
 ```
 
 ## `make` commands
