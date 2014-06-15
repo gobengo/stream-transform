@@ -39,6 +39,6 @@
     "sinon": "^1.10.2"
   },
   "dependencies": {
-    "stream-arrays": "0.0.2"
+    "stream-arrays": "~0.0"
   }
 }

@@ -78,10 +78,6 @@ describe('stream-transform', function () {
       assert.typeOf(transform.filter, 'function');
       var filteredStream = thingsStream.pipe(transform.filter(Boolean));
       var filtered = things.filter(Boolean);
-      var ogWrite = filteredStream.write;
-      filteredStream.write = function (x) {
-        return ogWrite.apply(this, arguments);
-      }
       assertStreams(filteredStream, filtered, done);
     });
   });
@@ -101,7 +97,7 @@ function assertStreams(readable, thingsToCycle, done) {
   });
   readable.on('error', done);
   readable.on('end', function () {
-    assert.equal(readsTested, thingsToCycle.length, 'read all vlues');
+    assert.equal(readsTested, thingsToCycle.length, 'read all values');
     done();
   });
 }
