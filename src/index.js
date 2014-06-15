@@ -2,7 +2,7 @@
 
 var Duplex = require('stream').Duplex;
 var Transform = require('stream').Transform;
-var ReadableArray = require('stream/contrib/readable-array');
+var ReadableArray = require('stream-arrays').ReadableArray;
 
 /**
  * stream-transform
