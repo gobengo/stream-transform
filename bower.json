@@ -14,7 +14,7 @@
     "tests"
   ],
   "dependencies": {
-    "stream": "Livefyre/stream#~0.1.1"
+    "stream": "Livefyre/stream#~0.2"
   },
   "devDependencies": {
     "cajon": "~0.2.4",

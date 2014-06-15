@@ -14,7 +14,7 @@ cycle([1,0])
   .pipe(transform(incrementAsync)
   .pipe(transform.map(increment)
   .pipe(transform.map(String))
-  .on('data', console.log);
+  .forEach(console.log);
 // '3'
 // '2'
 // '3'
