@@ -1,7 +1,7 @@
 "use strict";
 
 var transform = require('stream-transform');
-var ReadableArray = require('stream/contrib/readable-array');
+var ReadableArray = require('stream-arrays').ReadableArray;
 var assert = require('chai').assert;
 var sinon = require('sinon');
 
@@ -13,6 +13,7 @@ describe('stream-transform', function () {
     var transformedThings = things.map(increment);
     assertStreams(transformedThingsStream, transformedThings, done);
   });
+
   it('returned stream has .map()', function (done) {
     var things = [1,2,3,4];
     var thingsStream = new ReadableArray(things);
@@ -25,6 +26,40 @@ describe('stream-transform', function () {
       .map(String);
     assertStreams(transformedThingsStream, transformedThings, done);
   });
+
+  it('returned stream has .filter()', function (done) {
+    var things = [1,2,3,4];
+    var thingsStream = new ReadableArray(things);
+    var transformedThingsStream = thingsStream
+      .pipe(transform(thingsStream))
+      .filter(Boolean)
+    var transformedThings = things
+      .filter(Boolean)
+    assertStreams(transformedThingsStream, transformedThings, done);
+  });
+
+  it('can combine operators', function (done) {
+    var numberStrings = new ReadableArray([1,2,3])
+      .pipe(transform.filter(not(2)))
+      .pipe(transform(incrementAsync))
+      .pipe(transform.map(String))
+
+      numberStrings.on('end', function () {
+        done();
+      });
+
+      numberStrings.on('data', function (d) {
+        // these are valid outputs of this pipeline
+        assert.notEqual(['2', '4'].indexOf(d), -1);
+      });
+
+    function not(notValue) {
+        return function (value) {
+            return value != notValue;
+        };
+    }
+  });
+
   describe('.map', function () {
     it('maps a synchronous transformation function like Array.prototype.map', function (done) {
       var things = [1,2,3,4];
@@ -32,6 +67,18 @@ describe('stream-transform', function () {
       var transformedThingsStream = thingsStream.pipe(transform.map(increment));
       var transformedThings = things.map(increment);
       assertStreams(transformedThingsStream, transformedThings, done);
+    });
+  });
+
+  describe('.filter', function () {
+    it('maps a synchronous transformation function like Array.prototype.filter', function (done) {
+      var things = [1,2,0,3,4, 0, 1];
+      var thingsStream = new ReadableArray(things);
+
+      assert.typeOf(transform.filter, 'function');
+      var filteredStream = thingsStream.pipe(transform.filter(Boolean));
+      var filtered = things.filter(Boolean);
+      assertStreams(filteredStream, filtered, done);
     });
   });
 });
@@ -49,7 +96,10 @@ function assertStreams(readable, thingsToCycle, done) {
     readsTested++;
   });
   readable.on('error', done);
-  readable.on('end', done.bind({}, null));
+  readable.on('end', function () {
+    assert.equal(readsTested, thingsToCycle.length, 'read all values');
+    done();
+  });
 }
 
 function increment(x) {

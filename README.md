@@ -4,13 +4,19 @@ Create a [stream](https://github.com/Livefyre/stream)/Transform by providing an 
 
 ## Example
 
+From [the tests](./test/spec/):
+
 ```javascript
-var alternating = cycle([1,0]);
 function increment = function (x) { return x + 1; };
+function not = function (notValue) {
+    return function (value) {
+        return value != notValue;
+    }
+};
 function incrementAsync = function (x, done) { done(null, increment(x)); };
-cycle([1,0])
+cycle([1,2,3])
   .pipe(transform(incrementAsync)
-  .pipe(transform.map(increment)
+  .pipe(transform.filter(not(2))
   .pipe(transform.map(String))
   .forEach(console.log);
 // '3'

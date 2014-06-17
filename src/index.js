@@ -1,7 +1,7 @@
 'use strict'
 
-var Duplex = require('stream').Duplex;
-var Transform = require('stream').Transform;
+var Duplex = require('stream-objectmode').Duplex;
+var Transform = require('stream-objectmode').Transform;
 var ReadableArray = require('stream-arrays').ReadableArray;
 
 /**
@@ -36,6 +36,13 @@ var transform = module.exports = function (_transform) {
         _transform = function (x, done) { done(null, x); }
     }
 
+    if (Transform.prototype.write.length === 3) {
+        var ogTransform = _transform;
+        _transform = function nodeToObject(chunk, encoding, cb) {
+            ogTransform(chunk, cb);
+        }
+    }
+
     var transformer = new Transform({
         objectMode: true,
         highWaterMark: 1,
@@ -44,11 +51,13 @@ var transform = module.exports = function (_transform) {
     // record what flows through transform
     transformer._transform = _transform;
 
-    transformer.map = function () {
-        var mapped = transform.map.apply({}, arguments);
-        transformer.pipe(mapped);
-        return mapped;
-    }
+    ['map', 'filter'].forEach(function (operator) {
+        transformer[operator] = function (fn) {
+            var wrapped = transform[operator](fn);
+            transformer.pipe(wrapped);
+            return wrapped;
+        }
+    });
 
     return transformer;
 };
@@ -62,3 +71,19 @@ transform.map = function (syncTransform) {
         done(null, syncTransform(x));
     });
 };
+
+/**
+ * Create a Filter stream that omits values that
+ * are falsy after the applied syncFilter
+ */
+transform.filter = function (syncFilter) {
+    return transform(function (x, done) {
+        if (syncFilter(x)) {
+            return done(null, x);
+        }
+        // falsy filtered, skip
+        done();
+    });
+};
+
+
