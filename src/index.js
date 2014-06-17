@@ -88,6 +88,8 @@ transform.filter = function (syncFilter) {
 
 /**
  * Compose many transforms
+ * @param [...] {Transform|function} Args are the transforms you want to 
+ * compose into one. pass as many as you like
  */
 transform.compose = function (t1, t2) {
     var args = [].slice.call(arguments);
@@ -112,6 +114,7 @@ transform.compose = function (t1, t2) {
         });
     var composed = transform(function (x, done) {
         first.write(x);
+
         var out = [];
         var nextOut;
         while (nextOut = last.read()) {
