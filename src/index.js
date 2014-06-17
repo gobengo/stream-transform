@@ -94,13 +94,22 @@ transform.compose = function (t1, t2) {
     var first = args[0];
     // pipe all the arguments together and keep the last
     // one
-    var last = args.reduce(function (prev, stream) {
-        stream.on('error', onError);
-        if ( ! prev) {
-            return stream;
-        }
-        return prev.pipe(stream);
-    });
+    var last = args
+        // If passed a function, convert to Transform
+        .map(function (s) {
+            if (typeof s === 'function') {
+                return transform(s);
+            }
+            return s;
+        })
+        // Pipe all the streams, and catch errors on all of them
+        .reduce(function (prev, stream) {
+            stream.on('error', onError);
+            if ( ! prev) {
+                return stream;
+            }
+            return prev.pipe(stream);
+        });
     var composed = transform(function (x, done) {
         first.write(x);
         var out = [];
