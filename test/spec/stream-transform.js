@@ -84,7 +84,7 @@ describe('stream-transform', function () {
 
   describe('.compose', function () {
     it('can combine transforms', function (done) {
-      var incrementTwice = transform.compose(
+      var incrementLots = transform.compose(
         transform.map(increment),
         transform.map(increment),
         transform.map(increment),
@@ -92,9 +92,9 @@ describe('stream-transform', function () {
         transform.map(increment),
         transform.map(increment));
       var inputNumbers = [1,0,1,0,1,0,1,0];
-      var incrementedTwice = new ReadableArray(inputNumbers)
-        .pipe(incrementTwice)
-      assertStreams(incrementedTwice, [7,6,7,6,7,6,7,6], done);
+      var incrementedLots = new ReadableArray(inputNumbers)
+        .pipe(incrementLots)
+      assertStreams(incrementedLots, [7,6,7,6,7,6,7,6], done);
     });
   })
 });
