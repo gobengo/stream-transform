@@ -1,7 +1,7 @@
 'use strict'
 
-var Duplex = require('stream').Duplex;
-var Transform = require('stream').Transform;
+var Duplex = require('stream-objectmode').Duplex;
+var Transform = require('stream-objectmode').Transform;
 var ReadableArray = require('stream-arrays').ReadableArray;
 
 /**

@@ -11,7 +11,8 @@
   stubModules: ['text', 'hgn', 'json'],
   out: "../dist/stream-transform.min.js",
   cjsTranslate: true,
-  optimize: "none",
+  optimize: "uglify2",
+  preserveLicenseComments: false,
   uglify2: {
     compress: {
       unsafe: true

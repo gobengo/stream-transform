@@ -39,6 +39,7 @@
     "sinon": "^1.10.2"
   },
   "dependencies": {
-    "stream-arrays": "~0.0"
+    "stream-arrays": "~0.0",
+    "stream-objectmode": "0.0.0"
   }
 }
