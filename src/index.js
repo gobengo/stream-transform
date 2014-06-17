@@ -86,4 +86,35 @@ transform.filter = function (syncFilter) {
     });
 };
 
-
+/**
+ * Compose many transforms
+ */
+transform.compose = function (t1, t2) {
+    var args = [].slice.call(arguments);
+    var first = args[0];
+    // pipe all the arguments together and keep the last
+    // one
+    var last = args.reduce(function (prev, stream) {
+        if ( ! prev) {
+            return stream;
+        }
+        return prev.pipe(stream);
+    });
+    var composed = transform(function (x, done) {
+        first.write(x);
+        var out = [];
+        var nextOut;
+        while (nextOut = last.read()) {
+            out.push(nextOut);
+        }
+        if (out.length) {
+            return done.apply(this, [null].concat(out));
+        }
+        last.once('readable', function () {
+            debugger;
+            var out = last.read();
+            done(null, out);
+        })
+    });
+    return composed;
+} 

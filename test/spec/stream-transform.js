@@ -81,6 +81,22 @@ describe('stream-transform', function () {
       assertStreams(filteredStream, filtered, done);
     });
   });
+
+  describe('.compose', function () {
+    it('can combine transforms', function (done) {
+      var incrementTwice = transform.compose(
+        transform.map(increment),
+        transform.map(increment),
+        transform.map(increment),
+        transform.map(increment),
+        transform.map(increment),
+        transform.map(increment));
+      var inputNumbers = [1,0,1,0,1,0,1,0];
+      var incrementedTwice = new ReadableArray(inputNumbers)
+        .pipe(incrementTwice)
+      assertStreams(incrementedTwice, [7,6,7,6,7,6,7,6], done);
+    });
+  })
 });
 
 /**

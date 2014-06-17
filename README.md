@@ -15,8 +15,8 @@ function not = function (notValue) {
 };
 function incrementAsync = function (x, done) { done(null, increment(x)); };
 cycle([1,2,3])
-  .pipe(transform(incrementAsync)
-  .pipe(transform.filter(not(2))
+  .pipe(transform(incrementAsync))
+  .pipe(transform.filter(not(2)))
   .pipe(transform.map(String))
   .forEach(console.log);
 // '3'
@@ -25,6 +25,18 @@ cycle([1,2,3])
 // '2'
 // '3'
 // '2'
+```
+
+This could also be written as
+
+```javascript
+cycle([1,2,3])
+  .pipe(transform.compose(
+    transform(incrementAsync),
+    transform.filter(not(2)),
+    transform.map(String)
+  ))
+  .forEach(console.log);
 ```
 
 ## `make` commands
