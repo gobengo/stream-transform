@@ -95,6 +95,7 @@ transform.compose = function (t1, t2) {
     // pipe all the arguments together and keep the last
     // one
     var last = args.reduce(function (prev, stream) {
+        stream.on('error', onError);
         if ( ! prev) {
             return stream;
         }
@@ -111,10 +112,12 @@ transform.compose = function (t1, t2) {
             return done.apply(this, [null].concat(out));
         }
         last.once('readable', function () {
-            debugger;
             var out = last.read();
             done(null, out);
         })
     });
+    function onError(e) {
+        composed.emit('error', e);
+    }
     return composed;
 } 

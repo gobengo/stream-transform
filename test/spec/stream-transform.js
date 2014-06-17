@@ -96,6 +96,21 @@ describe('stream-transform', function () {
         .pipe(incrementLots)
       assertStreams(incrementedLots, [7,6,7,6,7,6,7,6], done);
     });
+    it('propogates errors', function (done) {
+      var pipelineWithError = transform.compose(
+        transform.map(increment),
+        transform(function (x, done) {
+          done(new Error());
+        }),
+        transform.map(increment));
+      // An error in the middle emits an error on the whole
+      // composed stream
+      pipelineWithError.on('error', function (e) {
+        done();
+      })
+      var incrementedLots = new ReadableArray([1,0,1,0,1,0,1,0])
+        .pipe(pipelineWithError)
+    });
   })
 });
 
