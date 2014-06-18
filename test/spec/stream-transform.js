@@ -109,6 +109,26 @@ describe('stream-transform', function () {
         .pipe(incrementLots)
       assertStreams(incrementedLots, [7,6,7,6,7,6,7,6], done);
     });
+    it('can add things with .use()', function (done) {
+      var incrementLots = transform.compose(
+        transform.map(increment));
+      incrementLots.use(transform.map(increment));
+      var inputNumbers = [1,0,1,0,1,0,1,0];
+      var incrementedLots = new ReadableArray(inputNumbers)
+        .pipe(incrementLots)
+      assertStreams(incrementedLots, [3,2,3,2,3,2,3,2], done);
+    });
+    it('can add several things with .use(a, b)', function (done) {
+      var incrementLots = transform.compose(
+        transform.map(increment));
+      incrementLots.use(
+        transform.map(increment),
+        transform.map(increment));
+      var inputNumbers = [1,0,1,0,1,0,1,0];
+      var incrementedLots = new ReadableArray(inputNumbers)
+        .pipe(incrementLots)
+      assertStreams(incrementedLots, [4,3,4,3,4,3,4,3], done);
+    });
     it('propogates errors', function (done) {
       var pipelineWithError = transform.compose(
         transform.map(increment),

@@ -93,17 +93,17 @@ transform.filter = function (syncFilter) {
  */
 transform.compose = function (t1, t2) {
     var args = [].slice.call(arguments);
-    var first = args[0];
+    var transforms = args
+        .filter(function (t) {
+            return typeof t !== 'number';
+        })
+        .map(ensureTransform);
+    var first = transforms[0];
     // pipe all the arguments together and keep the last
     // one
-    var last = args
+    var last = transforms
         // If passed a function, convert to Transform
-        .map(function (s) {
-            if (typeof s === 'function') {
-                return transform(s);
-            }
-            return s;
-        })
+        .map(ensureTransform)
         // Pipe all the streams, and catch errors on all of them
         .reduce(function (prev, stream) {
             stream.on('error', onError);
@@ -128,8 +128,46 @@ transform.compose = function (t1, t2) {
             done(null, out);
         })
     });
+
+    /**
+     * Add another transform to the mix (at the end)
+     * @param {number} Index to add (default -1)
+     * @param {function|Transform...} another transforms to add to the mix
+     */
+    composed.use = function use(t) {
+        // If a number is passed as arg, use that as the index to insert at
+        // default to -1 (the end);
+        var args = [].slice.call(arguments);
+        var index = -1;
+        var newTransforms = args.filter(function (t) {
+            return typeof t !== 'number';
+        });
+        
+        switch (newTransforms.length) {
+            case 0:
+              return;
+            case 1:
+              t = newTransforms[0];
+              break;
+            default:
+              t = transform.compose.apply(transform, newTransforms);
+        }
+        
+        t = ensureTransform(t);
+        transforms.splice(index, 0, t);
+        last.pipe(t);
+        last = t;
+        return this;
+    };
+
     function onError(e) {
         composed.emit('error', e);
+    }
+    function ensureTransform(t) {
+        if (typeof t === 'function') {
+            return transform(t);
+        }
+        return t;
     }
     return composed;
 } 
