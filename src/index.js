@@ -98,6 +98,9 @@ transform.compose = function (t1, t2) {
             return typeof t !== 'number';
         })
         .map(ensureTransform);
+    if ( ! transforms.length) {
+        transforms = [transform(function (x, done) { done(null, x); } )];
+    }
     var first = transforms[0];
     // pipe all the arguments together and keep the last
     // one
